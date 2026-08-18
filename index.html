@@ -1296,15 +1296,30 @@
   // no AndroidManifest.xml pelo apk-builder — ver "Registar URL scheme
   // personalizado" no build-apk.yml). Só funciona em Android e só se a app
   // realmente tiver esse scheme + package_name guardados nos dados da loja.
-  // Se a página continuar visível ~1.5s depois de tentarmos, é porque
-  // nenhuma app abriu (foi desinstalada sem usar "Esquecer", ou o browser
-  // não suporta intent://) — cai-se automaticamente para o download normal.
+  //
+  // IMPORTANTE: se a app não estiver instalada, o Chrome NÃO fica
+  // silenciosamente na mesma página — ele navega para uma página de erro
+  // própria dele ("elemento não encontrado"), destruindo esta página e todo
+  // o JavaScript com ela. Por isso é obrigatório passar S.browser_fallback_url:
+  // isso diz ao Android para onde voltar quando não encontra a app. Ao
+  // voltar, a URL traz "?autoget=<id>" — o código mais abaixo (ver
+  // "auto-download ao voltar do deep link") deteta isso e arranca o
+  // download sozinho, sem o utilizador ter de clicar outra vez.
   function tryOpenInstalledApp(app, card, state) {
     if (!isAndroid() || !app.url_scheme || !app.package_name) {
       downloadFreeApp(app, card, state);
       return;
     }
 
+    const scheme = String(app.url_scheme).trim().toLowerCase().replace(/[^a-z0-9]/g, '');
+    const pkg = String(app.package_name).trim();
+    const fallbackUrl = location.origin + location.pathname + '?autoget=' + encodeURIComponent(app.id);
+    const intentUrl = `intent://open#Intent;scheme=${encodeURIComponent(scheme)};package=${encodeURIComponent(pkg)};S.browser_fallback_url=${encodeURIComponent(fallbackUrl)};end`;
+    window.location.href = intentUrl;
+
+    // Rede de segurança adicional: em browsers que não respeitam
+    // browser_fallback_url mas também não mostram a página de erro (ficam
+    // parados na mesma página), isto garante que não fica preso para sempre.
     let settled = false;
     function cleanup() {
       document.removeEventListener('visibilitychange', onVisibilityChange);
@@ -1312,19 +1327,11 @@
     }
     function onVisibilityChange() {
       if (document.hidden && !settled) {
-        // A página foi para segundo plano — o Android trocou para a app.
-        // Sucesso: cancela o fallback, não há nada mais a fazer.
         settled = true;
         cleanup();
       }
     }
     document.addEventListener('visibilitychange', onVisibilityChange);
-
-    const scheme = String(app.url_scheme).trim().toLowerCase().replace(/[^a-z0-9]/g, '');
-    const pkg = String(app.package_name).trim();
-    const intentUrl = `intent://open#Intent;scheme=${encodeURIComponent(scheme)};package=${encodeURIComponent(pkg)};end`;
-    window.location.href = intentUrl;
-
     const timer = setTimeout(() => {
       if (settled) return;
       settled = true;
@@ -1455,6 +1462,7 @@
       const res = await fetchWithTimeout(API_BASE + '/store/apps', 15000);
       const data = await res.json();
       renderApps(data.apps || []);
+      handleAutoGetParam();
     } catch (e) {
       if (attempt === 1) {
         // El servidor gratuito puede estar "dormido"; avisamos y reintentamos
@@ -1468,6 +1476,26 @@
       }
       listEl.innerHTML = `<div id="empty">${t('apps.error')}</div>`;
     }
+  }
+
+  // Volta do deep link (ver tryOpenInstalledApp / browser_fallback_url):
+  // o Android trouxe o utilizador de volta a esta página com "?autoget=<id>"
+  // na URL porque não encontrou a app instalada — arranca o download dessa
+  // app sozinho, sem exigir um segundo clique. Limpa o parâmetro da URL logo
+  // a seguir, para não repetir o download se a pessoa atualizar a página.
+  function handleAutoGetParam() {
+    let appId;
+    try {
+      appId = new URLSearchParams(location.search).get('autoget');
+    } catch (e) {
+      return;
+    }
+    if (!appId || !lastApps) return;
+    history.replaceState(null, '', location.origin + location.pathname);
+    const app = lastApps.find((a) => a.id === appId);
+    if (!app) return;
+    const card = listEl.querySelector(`.app-card[data-app-id="${CSS.escape(app.id)}"]`);
+    downloadFreeApp(app, card, getAppState(app));
   }
 
   function planPriceLabel(app, planKey) {
