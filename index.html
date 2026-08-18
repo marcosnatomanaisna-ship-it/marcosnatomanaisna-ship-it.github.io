@@ -324,21 +324,52 @@
     border: 1px solid var(--card-border);
     border-radius: 14px;
     padding: 16px;
+    margin-bottom: 14px;
+  }
+  .app-card-row {
     display: flex;
     gap: 14px;
-    align-items: center;
-    margin-bottom: 14px;
+    align-items: flex-start;
   }
   .app-card .icon {
     font-size: 34px;
     width: 56px;
     height: 56px;
+    margin-top: 1px;
     display: flex;
     align-items: center;
     justify-content: center;
     background: var(--card);
     border-radius: 14px;
     flex-shrink: 0;
+    cursor: pointer;
+    overflow: hidden;
+    transition: transform .12s ease;
+  }
+  .app-card .icon:active { transform: scale(.92); }
+  .app-card .icon img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 14px;
+  }
+  .app-card .desc {
+    margin: 0;
+    padding: 0;
+    color: var(--text-soft);
+    font-size: 12.5px;
+    line-height: 1.5;
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+    transition: max-height .25s ease, opacity .2s ease, margin-top .25s ease, padding-top .25s ease;
+  }
+  .app-card.desc-open .desc {
+    max-height: 240px;
+    opacity: 1;
+    margin-top: 2px;
+    padding-top: 12px;
+    border-top: 1px solid var(--card-border);
   }
   .app-card .info { flex: 1; min-width: 0; }
   .app-card .name {
@@ -348,6 +379,20 @@
     line-height: 1.3;
   }
   .app-card .meta { color: var(--text-soft); font-size: 11px; margin-top: 6px; }
+  .app-card .forget-link {
+    display: block;
+    background: none;
+    border: none;
+    padding: 0;
+    margin-top: 5px;
+    color: var(--text-soft);
+    font-size: 10.5px;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    cursor: pointer;
+    text-align: left;
+  }
+  .app-card .forget-link:active { opacity: .6; }
   .badge-free {
     display: inline-block;
     background: rgba(52,211,153,.15);
@@ -369,6 +414,7 @@
     font-weight: 600;
     flex-shrink: 0;
     cursor: pointer;
+    margin-top: 1px;
   }
   .app-card button:active { background: var(--accent-hover); }
   .app-card button:disabled { opacity: .6; }
@@ -850,15 +896,15 @@
       'apps.error': 'Não foi possível conectar à MEDBI Store. Verifica a tua conexão.',
       'apps.getBtn': 'Obter',
       'apps.downloadBtn': 'Descarregar',
-      'apps.openBtn': 'Abrir',
+      'apps.openBtn': 'Descarregar de novo',
       'apps.updateBtn': 'Atualizar',
       'apps.freeBadge': 'Grátis',
-      'apps.installedBadge': 'Instalada',
-      'apps.openToast': 'Já tens esta app instalada. Abre-a a partir do ecrã inicial do teu telemóvel.\n\nSe já a desinstalaste, toca em "Descarregar de novo" para a obter outra vez.',
-      'apps.openConfirmBtn': 'Descarregar de novo',
-      'apps.openCancelBtn': 'Cancelar',
+      'apps.installedBadge': 'Já descarregada',
+      'apps.notInstalledLink': 'Já não a tens? Toca aqui',
       'apps.downloadError': 'Falha ao descarregar. Toca para tentar de novo.',
       'apps.downloadStarting': 'A iniciar...',
+      'apps.showInfo': 'Ver descrição da app',
+      'apps.noDescription': 'Sem descrição disponível para esta app.',
       'how.title': 'Como funciona',
       'how.step1.title': 'Escolhe a tua app',
       'how.step1.text': 'Toca em "Obter" ou "Descarregar" na app que precisas.',
@@ -924,15 +970,15 @@
       'apps.error': 'No fue posible conectar con MEDBI Store. Verifica tu conexión.',
       'apps.getBtn': 'Obtener',
       'apps.downloadBtn': 'Descargar',
-      'apps.openBtn': 'Abrir',
+      'apps.openBtn': 'Descargar de nuevo',
       'apps.updateBtn': 'Actualizar',
       'apps.freeBadge': 'Gratis',
-      'apps.installedBadge': 'Instalada',
-      'apps.openToast': 'Ya tienes esta app instalada. Ábrela desde la pantalla de inicio de tu teléfono.\n\nSi ya la desinstalaste, toca en "Descargar de nuevo" para obtenerla otra vez.',
-      'apps.openConfirmBtn': 'Descargar de nuevo',
-      'apps.openCancelBtn': 'Cancelar',
+      'apps.installedBadge': 'Ya descargada',
+      'apps.notInstalledLink': '¿Ya no la tienes? Toca aquí',
       'apps.downloadError': 'Error al descargar. Toca para intentar de nuevo.',
       'apps.downloadStarting': 'Iniciando...',
+      'apps.showInfo': 'Ver descripción de la app',
+      'apps.noDescription': 'No hay descripción disponible para esta app.',
       'how.title': 'Cómo funciona',
       'how.step1.title': 'Elige tu app',
       'how.step1.text': 'Toca en "Obtener" o "Descargar" en la app que necesitas.',
@@ -1137,38 +1183,69 @@
       }
       return `
       <div class="app-card" data-app-id="${esc(a.id)}">
-        <div class="icon">${a.icon || '📦'}</div>
-        <div class="info">
-          <p class="name">${esc(a.name)}</p>
-          ${free ? '<span class="badge-free">' + t('apps.freeBadge') + '</span>' : ''}
-          ${state === 'open' ? '<span class="badge-installed">' + t('apps.installedBadge') + '</span>' : ''}
-          <p class="meta">v${esc(a.version)}${a.size_mb ? ' · ' + a.size_mb + ' MB' : ''}</p>
-        </div>
-        <div class="progress-wrap" style="display:none;">
-          <div class="progress-track">
-            <div class="progress-fill ${state === 'update' ? 'is-update' : ''}"></div>
-            <span class="progress-label">0%</span>
+        <div class="app-card-row">
+          <div class="icon" role="button" aria-label="${t('apps.showInfo')}">${a.icon_url ? `<img src="${esc(a.icon_url)}" alt="">` : (a.icon || '📦')}</div>
+          <div class="info">
+            <p class="name">${esc(a.name)}</p>
+            ${free ? '<span class="badge-free">' + t('apps.freeBadge') + '</span>' : ''}
+            ${state === 'open' ? '<span class="badge-installed">' + t('apps.installedBadge') + '</span>' : ''}
+            <p class="meta">v${esc(a.version)}${a.size_mb ? ' · ' + a.size_mb + ' MB' : ''}</p>
+            ${state === 'open' ? `<button type="button" class="forget-link" data-app-id="${esc(a.id)}">${t('apps.notInstalledLink')}</button>` : ''}
           </div>
+          <div class="progress-wrap" style="display:none;">
+            <div class="progress-track">
+              <div class="progress-fill ${state === 'update' ? 'is-update' : ''}"></div>
+              <span class="progress-label">0%</span>
+            </div>
+          </div>
+          <button class="download-trigger ${btnClass}" data-state="${state}">${btnLabel}</button>
         </div>
-        <button class="download-trigger ${btnClass}" data-state="${state}">${btnLabel}</button>
+        <p class="desc">${esc(a.description || t('apps.noDescription'))}</p>
       </div>
     `;
     }).join('');
 
+    listEl.querySelectorAll('.icon').forEach((iconEl) => {
+      iconEl.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const card = iconEl.closest('.app-card');
+        card.classList.toggle('desc-open');
+      });
+    });
+
+    // Nota: uma página web nunca tem 100% de certeza se uma app continua instalada.
+    // Quando a app tem url_scheme + package_name registados (ver apk-build-routes.js/
+    // build-apk.yml), tentamos abri-la via deep link (Android/Chrome). Se não abrir
+    // em ~1.5s (app desinstalada, ou browser sem suporte a intent://), cai-se
+    // automaticamente para o download normal — nunca fica "preso" a tentar abrir
+    // algo que já não existe. Sem esses campos, ou fora do Android, mantém-se o
+    // comportamento anterior: descarrega sempre de novo.
     listEl.querySelectorAll('.download-trigger').forEach((btn) => {
       btn.addEventListener('click', (e) => {
         const card = e.target.closest('.app-card');
         const appId = card.getAttribute('data-app-id');
         const app = apps.find((a) => a.id === appId);
         const state = e.target.getAttribute('data-state');
-        if (state === 'open') {
-          openInstalledApp(app);
-          return;
-        }
         if (isEffectivelyFree(app)) {
-          downloadFreeApp(app, card, state);
+          if (state === 'open') {
+            tryOpenInstalledApp(app, card, state);
+          } else {
+            downloadFreeApp(app, card, state);
+          }
         } else {
           showAppModal(app);
+        }
+      });
+    });
+
+    listEl.querySelectorAll('.forget-link').forEach((link) => {
+      link.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const appId = link.getAttribute('data-app-id');
+        const app = apps.find((a) => a.id === appId);
+        if (app) {
+          forgetInstalled(app);
+          renderApps(lastApps);
         }
       });
     });
@@ -1200,45 +1277,58 @@
     }
   }
 
-  // App já instalada nesta versão: tenta abri-la (se soubermos o package),
-  // senão mostra uma mensagem a indicar que já está instalada.
-  // App já instalada nesta versão: o Android não permite abrir uma app arbitrária
-  // a partir do browser sem ela ter um deep link (custom URL scheme) registado,
-  // por isso mostramos apenas o aviso a pedir para abrir a partir do ecrã inicial.
-  // App já instalada nesta versão: o Android não permite abrir uma app arbitrária
-  // a partir do browser sem ela ter um deep link (custom URL scheme) registado,
-  // por isso mostramos um aviso — com opção de "esquecer" o registo local caso
-  // a pessoa já tenha desinstalado a app (o browser não tem forma de detetar isso sozinho).
+  // Uma página web nunca sabe com certeza se a app continua instalada no telemóvel
+  // sem um deep link/custom URL scheme registado pela própria app (ver
+  // tryOpenInstalledApp abaixo). "medbi_installed_<id>" é só a memória local deste
+  // telemóvel de que já a descarregou; esta função limpa essa memória, para o caso
+  // de a pessoa já a ter desinstalado.
   function forgetInstalled(app) {
     try { localStorage.removeItem('medbi_installed_' + app.id); } catch (e) { /* silencioso */ }
   }
 
-  function openInstalledApp(app) {
-    const overlay = document.createElement('div');
-    overlay.className = 'modal-overlay';
-    overlay.innerHTML = `
-      <div class="modal">
-        <h2>${esc(app.name)}</h2>
-        <p style="white-space:pre-line;">${esc(t('apps.openToast'))}</p>
-        <button class="download-btn" id="reinstallConfirmBtn" style="border:none;cursor:pointer;">
-          ${t('apps.openConfirmBtn')}
-        </button>
-        <button class="close-btn" id="reinstallCancelBtn">${t('apps.openCancelBtn')}</button>
-      </div>
-    `;
-    document.body.appendChild(overlay);
+  function isAndroid() {
+    return /Android/i.test(navigator.userAgent || '');
+  }
 
-    overlay.querySelector('#reinstallConfirmBtn').addEventListener('click', () => {
-      overlay.remove();
-      forgetInstalled(app);
-      if (isEffectivelyFree(app)) {
-        downloadFreeApp(app);
-      } else {
-        showAppModal(app);
+  // Tenta abrir a app já instalada via deep link (custom URL scheme registado
+  // no AndroidManifest.xml pelo apk-builder — ver "Registar URL scheme
+  // personalizado" no build-apk.yml). Só funciona em Android e só se a app
+  // realmente tiver esse scheme + package_name guardados nos dados da loja.
+  // Se a página continuar visível ~1.5s depois de tentarmos, é porque
+  // nenhuma app abriu (foi desinstalada sem usar "Esquecer", ou o browser
+  // não suporta intent://) — cai-se automaticamente para o download normal.
+  function tryOpenInstalledApp(app, card, state) {
+    if (!isAndroid() || !app.url_scheme || !app.package_name) {
+      downloadFreeApp(app, card, state);
+      return;
+    }
+
+    let settled = false;
+    function cleanup() {
+      document.removeEventListener('visibilitychange', onVisibilityChange);
+      clearTimeout(timer);
+    }
+    function onVisibilityChange() {
+      if (document.hidden && !settled) {
+        // A página foi para segundo plano — o Android trocou para a app.
+        // Sucesso: cancela o fallback, não há nada mais a fazer.
+        settled = true;
+        cleanup();
       }
-    });
-    overlay.querySelector('#reinstallCancelBtn').addEventListener('click', () => overlay.remove());
-    overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.remove(); });
+    }
+    document.addEventListener('visibilitychange', onVisibilityChange);
+
+    const scheme = String(app.url_scheme).trim().toLowerCase().replace(/[^a-z0-9]/g, '');
+    const pkg = String(app.package_name).trim();
+    const intentUrl = `intent://open#Intent;scheme=${encodeURIComponent(scheme)};package=${encodeURIComponent(pkg)};end`;
+    window.location.href = intentUrl;
+
+    const timer = setTimeout(() => {
+      if (settled) return;
+      settled = true;
+      cleanup();
+      downloadFreeApp(app, card, state);
+    }, 1500);
   }
 
   function downloadFreeApp(app, cardEl, state) {
