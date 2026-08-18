@@ -897,6 +897,7 @@
       'apps.getBtn': 'Obter',
       'apps.downloadBtn': 'Descarregar',
       'apps.openBtn': 'Descarregar de novo',
+      'apps.openAppBtn': 'Abrir',
       'apps.updateBtn': 'Atualizar',
       'apps.freeBadge': 'Grátis',
       'apps.installedBadge': 'Já descarregada',
@@ -971,6 +972,7 @@
       'apps.getBtn': 'Obtener',
       'apps.downloadBtn': 'Descargar',
       'apps.openBtn': 'Descargar de nuevo',
+      'apps.openAppBtn': 'Abrir',
       'apps.updateBtn': 'Actualizar',
       'apps.freeBadge': 'Gratis',
       'apps.installedBadge': 'Ya descargada',
@@ -1172,7 +1174,7 @@
       const state = getAppState(a);
       let btnLabel, btnClass;
       if (state === 'open') {
-        btnLabel = t('apps.openBtn');
+        btnLabel = (isAndroid() && a.url_scheme && a.package_name) ? t('apps.openAppBtn') : t('apps.openBtn');
         btnClass = 'btn-open';
       } else if (state === 'update') {
         btnLabel = t('apps.updateBtn');
