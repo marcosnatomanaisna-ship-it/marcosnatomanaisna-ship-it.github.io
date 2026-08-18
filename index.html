@@ -36,7 +36,7 @@
 <link rel="icon" type="image/x-icon" href="favicon.ico">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
 <link rel="apple-touch-icon" sizes="180x180" href="icon-192.png">
-<meta name="theme-color" content="#0b1220">
+<meta name="theme-color" content="#ffffff">
 
 <!-- Schema.org: ajuda motores de busca e IA a reconhecer o MEDBI Store como entidade -->
 <script type="application/ld+json">
@@ -117,16 +117,16 @@
 
 <style>
   :root {
-    --bg: #0b1220;
-    --card: #121b2e;
-    --card-border: #1e2a44;
-    --text: #ffffff;
-    --text-soft: #93a3bd;
+    --bg: #ffffff;
+    --card: #f5f7fb;
+    --card-border: #e2e8f0;
+    --text: #0b1220;
+    --text-soft: #5b6b85;
     --accent: #2563eb;
     --accent-hover: #1d4ed8;
-    --danger: #f87171;
-    --success: #34d399;
-    --gold: #f0b429;
+    --danger: #dc2626;
+    --success: #059669;
+    --gold: #b8860b;
   }
   * { box-sizing: border-box; }
   html { scroll-behavior: smooth; }
@@ -147,7 +147,7 @@
     align-items: center;
     justify-content: space-between;
     padding: 12px 16px;
-    background: rgba(11,18,32,.9);
+    background: rgba(255,255,255,.9);
     backdrop-filter: blur(10px);
     border-bottom: 1px solid var(--card-border);
   }
@@ -269,7 +269,7 @@
     display: flex;
     align-items: center;
     gap: 6px;
-    background: #0e1a30;
+    background: var(--card);
     border: 1px solid var(--card-border);
     border-radius: 999px;
     padding: 7px 13px;
@@ -336,7 +336,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    background: #0e1a30;
+    background: var(--card);
     border-radius: 14px;
     flex-shrink: 0;
   }
@@ -383,6 +383,38 @@
     color: #241a02;
   }
   .app-card button.btn-update:active { background: #d99e1f; }
+  .app-card .progress-wrap {
+    flex-shrink: 0;
+    width: 96px;
+  }
+  .app-card .progress-track {
+    position: relative;
+    width: 100%;
+    height: 24px;
+    background: rgba(147,163,189,.15);
+    border-radius: 999px;
+    overflow: hidden;
+  }
+  .app-card .progress-fill {
+    position: absolute;
+    top: 0; left: 0; bottom: 0;
+    width: 0%;
+    background: var(--accent);
+    border-radius: 999px;
+    transition: width .15s ease;
+  }
+  .app-card .progress-fill.is-update { background: var(--gold); }
+  .app-card .progress-label {
+    position: relative;
+    z-index: 1;
+    display: block;
+    text-align: center;
+    line-height: 24px;
+    font-size: 11px;
+    font-weight: 700;
+    color: #fff;
+    white-space: nowrap;
+  }
   .badge-installed {
     display: inline-block;
     background: rgba(147,163,189,.12);
@@ -420,7 +452,7 @@
   .modal h2 { margin: 0 0 4px; font-size: 18px; }
   .modal p { color: var(--text-soft); font-size: 13px; margin: 0 0 18px; }
   .code-box {
-    background: #0e1a30;
+    background: var(--card);
     border: 1px dashed var(--accent);
     border-radius: 12px;
     padding: 16px;
@@ -442,7 +474,7 @@
   }
   .steps {
     text-align: left;
-    background: #0e1a30;
+    background: var(--card);
     border-radius: 12px;
     padding: 14px 16px;
     font-size: 13px;
@@ -463,6 +495,33 @@
     font-weight: 600;
     margin-bottom: 10px;
   }
+  .modal .progress-track {
+    position: relative;
+    width: 100%;
+    height: 40px;
+    background: rgba(147,163,189,.15);
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 10px;
+  }
+  .modal .progress-fill {
+    position: absolute;
+    top: 0; left: 0; bottom: 0;
+    width: 0%;
+    background: var(--accent);
+    border-radius: 12px;
+    transition: width .15s ease;
+  }
+  .modal .progress-label {
+    position: relative;
+    z-index: 1;
+    display: block;
+    text-align: center;
+    line-height: 40px;
+    font-size: 14px;
+    font-weight: 700;
+    color: #fff;
+  }
   .close-btn {
     display: block;
     width: 100%;
@@ -480,7 +539,7 @@
   }
   .plan-option {
     flex: 1;
-    background: #0e1a30;
+    background: var(--card);
     border: 1px solid var(--card-border);
     border-radius: 12px;
     padding: 12px 10px;
@@ -515,7 +574,7 @@
   .how-step .num {
     width: 30px; height: 30px;
     border-radius: 50%;
-    background: #0e1a30;
+    background: var(--card);
     border: 1px solid var(--accent);
     color: var(--accent);
     display: flex; align-items: center; justify-content: center;
@@ -590,7 +649,7 @@
     padding: 20px 16px;
   }
   .contact-card {
-    background: linear-gradient(135deg, #0e1a30, var(--card));
+    background: linear-gradient(135deg, var(--card), #eef2f9);
     border: 1px solid var(--card-border);
     border-radius: 16px;
     padding: 20px;
@@ -798,6 +857,8 @@
       'apps.openToast': 'Já tens esta app instalada. Abre-a a partir do ecrã inicial do teu telemóvel.\n\nSe já a desinstalaste, toca em "Descarregar de novo" para a obter outra vez.',
       'apps.openConfirmBtn': 'Descarregar de novo',
       'apps.openCancelBtn': 'Cancelar',
+      'apps.downloadError': 'Falha ao descarregar. Toca para tentar de novo.',
+      'apps.downloadStarting': 'A iniciar...',
       'how.title': 'Como funciona',
       'how.step1.title': 'Escolhe a tua app',
       'how.step1.text': 'Toca em "Obter" ou "Descarregar" na app que precisas.',
@@ -870,6 +931,8 @@
       'apps.openToast': 'Ya tienes esta app instalada. Ábrela desde la pantalla de inicio de tu teléfono.\n\nSi ya la desinstalaste, toca en "Descargar de nuevo" para obtenerla otra vez.',
       'apps.openConfirmBtn': 'Descargar de nuevo',
       'apps.openCancelBtn': 'Cancelar',
+      'apps.downloadError': 'Error al descargar. Toca para intentar de nuevo.',
+      'apps.downloadStarting': 'Iniciando...',
       'how.title': 'Cómo funciona',
       'how.step1.title': 'Elige tu app',
       'how.step1.text': 'Toca en "Obtener" o "Descargar" en la app que necesitas.',
@@ -1081,6 +1144,12 @@
           ${state === 'open' ? '<span class="badge-installed">' + t('apps.installedBadge') + '</span>' : ''}
           <p class="meta">v${esc(a.version)}${a.size_mb ? ' · ' + a.size_mb + ' MB' : ''}</p>
         </div>
+        <div class="progress-wrap" style="display:none;">
+          <div class="progress-track">
+            <div class="progress-fill ${state === 'update' ? 'is-update' : ''}"></div>
+            <span class="progress-label">0%</span>
+          </div>
+        </div>
         <button class="download-trigger ${btnClass}" data-state="${state}">${btnLabel}</button>
       </div>
     `;
@@ -1097,12 +1166,38 @@
           return;
         }
         if (isEffectivelyFree(app)) {
-          downloadFreeApp(app);
+          downloadFreeApp(app, card, state);
         } else {
           showAppModal(app);
         }
       });
     });
+  }
+
+  // Mostra/atualiza a barra de progresso dentro do card da app.
+  // percent: 0-100, ou null para modo "indeterminado" (quando não há Content-Length).
+  function setCardProgress(card, percent) {
+    const wrap = card.querySelector('.progress-wrap');
+    const btn = card.querySelector('.download-trigger');
+    const fill = card.querySelector('.progress-fill');
+    const label = card.querySelector('.progress-label');
+    if (!wrap || !btn || !fill || !label) return;
+    if (percent === false) {
+      // termina: esconde a barra, mostra o botão de novo
+      wrap.style.display = 'none';
+      btn.style.display = '';
+      return;
+    }
+    wrap.style.display = 'block';
+    btn.style.display = 'none';
+    if (percent === null) {
+      label.textContent = t('apps.downloadStarting');
+      fill.style.width = '30%';
+    } else {
+      const p = Math.max(0, Math.min(100, Math.round(percent)));
+      fill.style.width = p + '%';
+      label.textContent = p + '%';
+    }
   }
 
   // App já instalada nesta versão: tenta abri-la (se soubermos o package),
@@ -1146,16 +1241,79 @@
     overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.remove(); });
   }
 
-  function downloadFreeApp(app) {
-    trackDownload(app);
-    markInstalled(app);
-    const a = document.createElement('a');
-    a.href = app.apk_url || '#';
-    a.setAttribute('download', '');
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    if (lastApps) renderApps(lastApps);
+  function downloadFreeApp(app, cardEl, state) {
+    const url = app.apk_url || '#';
+    const card = cardEl || (lastApps && listEl.querySelector(`.app-card[data-app-id="${CSS.escape(app.id)}"]`));
+
+    // Sem card disponível (ex.: chamado a partir do modal) — mantém o comportamento simples anterior.
+    if (!card) {
+      trackDownload(app);
+      markInstalled(app);
+      const a = document.createElement('a');
+      a.href = url;
+      a.setAttribute('download', '');
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      return;
+    }
+
+    setCardProgress(card, null); // estado inicial "a iniciar..."
+
+    fetch(url)
+      .then((res) => {
+        if (!res.ok || !res.body) throw new Error('bad response');
+        const total = Number(res.headers.get('Content-Length')) || 0;
+        let loaded = 0;
+        const reader = res.body.getReader();
+        const chunks = [];
+
+        function pump() {
+          return reader.read().then(({ done, value }) => {
+            if (done) return;
+            chunks.push(value);
+            loaded += value.length;
+            if (total) {
+              setCardProgress(card, (loaded / total) * 100);
+            } else {
+              setCardProgress(card, null); // sem tamanho conhecido: mantém indeterminado
+            }
+            return pump();
+          });
+        }
+
+        return pump().then(() => {
+          const blob = new Blob(chunks);
+          const blobUrl = URL.createObjectURL(blob);
+          const filename = (url.split('/').pop() || (app.id + '.apk')).split('?')[0];
+          const a = document.createElement('a');
+          a.href = blobUrl;
+          a.download = filename;
+          document.body.appendChild(a);
+          a.click();
+          a.remove();
+          setTimeout(() => URL.revokeObjectURL(blobUrl), 10000);
+
+          trackDownload(app);
+          markInstalled(app);
+          setCardProgress(card, false);
+          if (lastApps) renderApps(lastApps);
+        });
+      })
+      .catch(() => {
+        // Falha (ex.: CORS no ficheiro APK, rede em baixo): recorre ao download direto do browser
+        // sem barra de progresso, para nunca bloquear a descarga por causa disto.
+        trackDownload(app);
+        markInstalled(app);
+        const a = document.createElement('a');
+        a.href = url;
+        a.setAttribute('download', '');
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        setCardProgress(card, false);
+        if (lastApps) renderApps(lastApps);
+      });
   }
 
   // Verifica se este telemóvel já registou um download deste app (guardado no localStorage)
